@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-import { User, UsersService } from '../users';
+import { MinimalSocialProfile, User, UsersService } from '../users';
 
 @Injectable()
 export class AuthService {
@@ -13,9 +13,19 @@ export class AuthService {
   async validateUser(username: string, password: string): Promise<Omit<User, 'password'> | null> {
     const user = await this.usersService.findByUsername(username);
     if (user?.password === password) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...result } = user;
-      return result;
+      return this.stripPassword(user);
+    }
+
+    return null;
+  }
+
+  async validateUserBySocialLogin(
+    socialId: string,
+    profile?: MinimalSocialProfile,
+  ): Promise<Omit<User, 'password'> | null> {
+    const user = await this.usersService.findBySocialIdOrCreate(socialId, profile);
+    if (user) {
+      return this.stripPassword(user);
     }
 
     return null;
@@ -26,5 +36,11 @@ export class AuthService {
     return {
       access_token: await this.jwtService.signAsync(payload),
     };
+  }
+
+  private stripPassword(user: User): Omit<User, 'password'> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...result } = user;
+    return result;
   }
 }
