@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TimeService } from './time.service';
+import { TimeService } from './features/time';
 
 describe('AppController', () => {
   let appController: AppController;

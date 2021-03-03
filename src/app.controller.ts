@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 
 import { AppService } from './app.service';
-import { TimeService } from './time.service';
+import { TimeService } from './features/time';
 
 @Controller()
 export class AppController {
