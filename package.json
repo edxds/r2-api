@@ -15,6 +15,7 @@
     "start:debug-brk": "nest start --exec \"node -r ts-node/register -r dotenv/config --inspect-brk\" --watch",
     "start:prod": "node -r ts-node/register -r dotenv/config dist/src/main",
     "typeorm": "node -r ts-node/register -r dotenv/config ./node_modules/typeorm/cli.js",
+    "db:migration:generate": "yarn run typeorm migration:generate -n",
     "db:migration:new": "yarn run typeorm migration:create -n",
     "db:migration:run": "yarn run typeorm migration:run",
     "db:migration:revert": "yarn run typeorm migration:revert",
