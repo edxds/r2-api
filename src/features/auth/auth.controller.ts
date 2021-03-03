@@ -35,7 +35,11 @@ export class AuthController {
   }
 
   private async generateJwtAndAttach(req: Request, res: Response) {
-    const result = await this.authService.login(req.user as Omit<User, 'password'>);
+    const result = await this.authService.login(
+      req.user as Omit<User, 'password'>,
+      req.headers['user-agent'],
+    );
+
     const isSecure = req.secure;
     res.cookie('token', result.access_token, { secure: isSecure, httpOnly: true });
 

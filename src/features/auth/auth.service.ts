@@ -1,12 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
+import { TimeService } from '../time';
 import { MinimalSocialProfile, User, UsersService } from '../users';
+
+export type AuthJwtPayload = {
+  sub: number;
+  username: string;
+  hash: string;
+  agent: string;
+};
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService, //
+    private timeService: TimeService,
     private jwtService: JwtService,
   ) {}
 
@@ -31,10 +40,9 @@ export class AuthService {
     return null;
   }
 
-  async login(user: Omit<User, 'password'>): Promise<{ access_token: string }> {
-    const payload = { username: user.username, sub: user.id };
+  async login(user: Omit<User, 'password'>, agent: string): Promise<{ access_token: string }> {
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      access_token: await this.jwtService.signAsync(this.generateJwtPayload(user, agent)),
     };
   }
 
@@ -42,5 +50,14 @@ export class AuthService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...result } = user;
     return result;
+  }
+
+  private generateJwtPayload(user: Omit<User, 'password'>, agent: string): AuthJwtPayload {
+    return {
+      sub: user.id,
+      username: user.username,
+      hash: this.timeService.getCurrentTimestampHash(),
+      agent,
+    };
   }
 }
