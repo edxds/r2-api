@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 
-import { MinimalSocialProfile, User } from './users.types';
+import { User } from './user.entity';
+import { MinimalSocialProfile } from './users.types';
 
 @Injectable()
 export class UsersService {
   private readonly users: User[] = [
-    { id: 1, username: 'edu', email: 'edu@jamelon.com', password: 'changeme' },
-    { id: 2, username: 'ana', email: 'ana@jamelon.com', password: 'changeme1' },
+    { id: 1, username: 'edu', email: 'edu@jamelon.com', password: 'changeme', needsSetup: false },
+    { id: 2, username: 'ana', email: 'ana@jamelon.com', password: 'changeme1', needsSetup: false },
   ];
 
   async findByUsername(username: string): Promise<User | undefined> {
@@ -26,7 +27,9 @@ export class UsersService {
       const newUser = {
         username: '__undefined',
         ...profile,
+        password: '',
         socialId: profile.id,
+        needsSetup: true,
         id: this.users[this.users.length - 1].id + 1,
       };
 
