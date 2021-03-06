@@ -1,41 +1,88 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { IsEmail, IsNotEmpty, Length } from 'class-validator';
+import { Repository } from 'typeorm';
+import { hash } from 'bcrypt';
 
 import { User } from './user.entity';
 import { MinimalSocialProfile } from './users.types';
 
 @Injectable()
 export class UsersService {
-  private readonly users: User[] = [
-    { id: 1, username: 'edu', email: 'edu@jamelon.com', password: 'changeme', needsSetup: false },
-    { id: 2, username: 'ana', email: 'ana@jamelon.com', password: 'changeme1', needsSetup: false },
-  ];
+  constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+  ) {}
+
+  async register(user: RegisterUserDto) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...result } = await this.userRepository.save({
+      ...user,
+      password: await hash(user.password, 5),
+      needsSetup: false,
+    });
+
+    return result;
+  }
 
   async findByUsername(username: string): Promise<User | undefined> {
-    return this.users.find((u) => u.username === username);
+    return this.userRepository.findOne({ where: { username } });
   }
 
   async findBySocialIdOrCreate(
     socialId: string,
     profile?: MinimalSocialProfile,
   ): Promise<User | undefined> {
-    const user = this.users.find((u) => u.socialId === socialId);
+    const user = await this.userRepository.findOne({ where: { socialId } });
     if (!user) {
       if (!profile) {
         return;
       }
 
-      const newUser = {
-        username: '__undefined',
-        ...profile,
-        password: '',
-        socialId: profile.id,
-        needsSetup: true,
-        id: this.users[this.users.length - 1].id + 1,
-      };
+      let generatedUsername: string;
+      let conflictingUser: User | undefined;
+      let tries = 0;
 
-      this.users.push(newUser);
-      console.log(this.users);
-      return newUser;
+      do {
+        if (tries >= 5) {
+          throw new HttpException('Não foi possível gerar um nome de usuário temporário', 409);
+        }
+
+        generatedUsername = this.generateUniqueUsername(profile.username);
+        conflictingUser = await this.userRepository.findOne({
+          where: { username: generatedUsername },
+        });
+
+        tries++;
+      } while (conflictingUser);
+
+      const { id, ..._profile } = profile;
+      return await this.userRepository.save({
+        ..._profile,
+        socialId: id,
+        username: generatedUsername,
+        needsSetup: true,
+        password: '',
+      });
     }
   }
+
+  private generateUniqueUsername(prefix: string) {
+    return `${prefix}_${this.generateRandomSixDigitNumber()}`;
+  }
+
+  private generateRandomSixDigitNumber() {
+    return Math.floor(100000 + Math.random() * 900000);
+  }
+}
+
+export class RegisterUserDto {
+  @IsEmail()
+  email: string;
+
+  @IsNotEmpty()
+  username: string;
+
+  @Length(6)
+  password: string;
 }

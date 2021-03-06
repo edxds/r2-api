@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { compare } from 'bcrypt';
 
 import { MinimalSocialProfile, User, UsersService } from '../users';
 
@@ -8,7 +9,7 @@ export class AuthService {
 
   async validateUser(username: string, password: string): Promise<Omit<User, 'password'> | null> {
     const user = await this.usersService.findByUsername(username);
-    if (user?.password === password) {
+    if (user && (await compare(password, user.password))) {
       return this.stripPassword(user);
     }
 

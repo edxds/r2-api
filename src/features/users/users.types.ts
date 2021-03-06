@@ -1,6 +1,6 @@
 export type MinimalSocialProfile = {
   id: string;
   name?: string;
-  username?: string;
+  username: string;
   email: string;
 };
