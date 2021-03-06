@@ -1,13 +1,13 @@
 import { ExtractJwt, Strategy, StrategyOptions } from 'passport-jwt';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 
-import { AuthJwtPayload } from './auth.service';
 import { constants } from './constants';
+import { Token, TokensService } from './tokens';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor() {
+  constructor(private tokensService: TokensService) {
     super({
       ignoreExpiration: true,
       secretOrKey: constants.secret,
@@ -22,7 +22,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     } as StrategyOptions);
   }
 
-  async validate(payload: AuthJwtPayload) {
-    return { userId: payload.sub, username: payload.username };
+  async validate(token: Token) {
+    if (await this.tokensService.wasRevoked(token.id)) {
+      throw new UnauthorizedException();
+    }
+
+    return { id: token.sub };
   }
 }
