@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
   Post,
   Req,
   Res,
@@ -26,7 +27,16 @@ export class AuthController {
   @Post('register')
   @UsePipes(new ValidationPipe())
   async register(@Body() registerDto: RegisterUserDto) {
-    return this.userService.register(registerDto);
+    try {
+      return await this.userService.register(registerDto);
+    } catch (error) {
+      if (error.constraint === 'UQ_USERNAME')
+        throw new HttpException('Um usuário já existe com esse nome de usuário', 409);
+      if (error.constraint === 'UQ_EMAIL')
+        throw new HttpException('Um usuário já existe com esse e-mail', 409);
+
+      throw error;
+    }
   }
 
   @UseGuards(AuthGuard('local'))
