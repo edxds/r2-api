@@ -26,9 +26,17 @@ export class AuthController {
 
   @Post('register')
   @UsePipes(new ValidationPipe())
-  async register(@Body() registerDto: RegisterUserDto) {
+  async register(
+    @Body() registerDto: RegisterUserDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     try {
-      return await this.userService.register(registerDto);
+      const user = await this.userService.register(registerDto);
+      return this.generateJwtAndAttach(
+        { user, agent: req.headers['user-agent'], isSecure: req.secure },
+        res,
+      );
     } catch (error) {
       if (error.constraint === 'UQ_USERNAME')
         throw new HttpException('Um usuário já existe com esse nome de usuário', 409);
@@ -42,7 +50,7 @@ export class AuthController {
   @UseGuards(AuthGuard('local'))
   @Post('local')
   async login(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    return this.generateJwtAndAttach(req, res);
+    return this.generateJwtAndAttachFromRequest(req, res);
   }
 
   @UseGuards(AuthGuard('google'))
@@ -54,7 +62,7 @@ export class AuthController {
   @UseGuards(AuthGuard('google'))
   @Get('google/callback')
   async googleCallback(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    return this.generateJwtAndAttach(req, res);
+    return this.generateJwtAndAttachFromRequest(req, res);
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -63,18 +71,30 @@ export class AuthController {
     return { message: "You're in!", user: req.user };
   }
 
-  private async generateJwtAndAttach(req: Request, res: Response) {
-    const user = req.user as Omit<User, 'password'>;
+  private async generateJwtAndAttachFromRequest(req: Request, res?: Response) {
+    return this.generateJwtAndAttach(
+      {
+        user: req.user as Omit<User, 'password'>,
+        agent: req.headers['user-agent'],
+        isSecure: req.secure,
+      },
+      res,
+    );
+  }
+
+  private async generateJwtAndAttach(
+    { user, agent, isSecure }: { user: Omit<User, 'password'>; agent: string; isSecure?: boolean },
+    res?: Response,
+  ) {
     const result = await this.tokensService.createAndPersist({
       userId: user.id,
-      agent: req.headers['user-agent'],
+      agent: agent,
     });
 
-    const isSecure = req.secure;
     res.cookie('token', result.access_token, { secure: isSecure, httpOnly: true });
 
     return {
-      user: req.user,
+      user: user,
       access_token: result.access_token,
     };
   }
