@@ -73,6 +73,9 @@ export class AuthController {
     const isSecure = req.secure;
     res.cookie('token', result.access_token, { secure: isSecure, httpOnly: true });
 
-    return result;
+    return {
+      user: req.user,
+      access_token: result.access_token,
+    };
   }
 }
