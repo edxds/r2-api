@@ -91,7 +91,17 @@ export class AuthController {
       agent: agent,
     });
 
-    res.cookie('token', result.access_token, { secure: isSecure, httpOnly: true });
+    res.cookie(
+      'token',
+      result.access_token,
+      process.env.NODE_ENV === 'development'
+        ? {
+            secure: false,
+            sameSite: 'lax',
+            httpOnly: true,
+          }
+        : { secure: isSecure, httpOnly: true },
+    );
 
     return {
       user: user,
