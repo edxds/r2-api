@@ -91,12 +91,12 @@ export class AuthController {
       agent: agent,
     });
 
+    const environment = process.env.NODE_ENV ?? 'development';
     res.cookie(
       'token',
       result.access_token,
-      process.env.NODE_ENV === 'development'
+      environment === 'development'
         ? {
-            secure: false,
             sameSite: 'lax',
             httpOnly: true,
           }
