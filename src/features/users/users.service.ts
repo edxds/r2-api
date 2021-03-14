@@ -81,12 +81,12 @@ export class UsersService {
 }
 
 export class RegisterUserDto {
-  @IsEmail()
+  @IsEmail(undefined, { message: 'O e-mail fornecido não é válido' })
   email: string;
 
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'O nome de usuário é obrigatório!' })
   username: string;
 
-  @Length(6)
+  @Length(6, undefined, { message: 'Sua senha precisa ter no mínimo 6 dígitos' })
   password: string;
 }
