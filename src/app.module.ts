@@ -8,9 +8,10 @@ import { AppService } from './app.service';
 import { TimeModule } from './features/time';
 import { UsersModule } from './features/users';
 import { AuthModule } from './features/auth';
+import { CommunityModule } from './features/community/community.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(config), UsersModule, AuthModule, TimeModule],
+  imports: [TypeOrmModule.forRoot(config), UsersModule, AuthModule, TimeModule, CommunityModule],
   controllers: [AppController],
   providers: [AppService],
 })
