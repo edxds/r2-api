@@ -83,7 +83,11 @@ export class AuthController {
   }
 
   private async generateJwtAndAttach(
-    { user, agent, isSecure }: { user: Omit<User, 'password'>; agent: string; isSecure?: boolean },
+    {
+      user,
+      agent = '',
+      isSecure,
+    }: { user: Omit<User, 'password'>; agent?: string; isSecure?: boolean },
     res?: Response,
   ) {
     const result = await this.tokensService.createAndPersist({
@@ -92,7 +96,7 @@ export class AuthController {
     });
 
     const environment = process.env.NODE_ENV ?? 'development';
-    res.cookie(
+    res?.cookie(
       'token',
       result.access_token,
       environment === 'development'

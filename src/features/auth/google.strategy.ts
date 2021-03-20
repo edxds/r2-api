@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy, StrategyOptions } from 'passport-google-oauth20';
 
@@ -33,6 +33,10 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
 
   private createGoogleMinimalSocialProfile(profile: Profile): MinimalSocialProfile {
     const email = profile.emails?.[0].value;
+    if (!email) {
+      throw new HttpException('E-mail não retornado pelo provedor', 400);
+    }
+
     return {
       id: profile.id,
       name: profile.name?.givenName,

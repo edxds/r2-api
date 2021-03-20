@@ -35,7 +35,7 @@ export class CommunityService {
 
   async update(id: number, updateCommunityDto: UpdateCommunityDto): Promise<Community> {
     const community = await this.findOne(id);
-    return this.communityRepo.save({ id, ...community, ...updateCommunityDto });
+    return this.communityRepo.save({ ...community, ...updateCommunityDto });
   }
 
   async remove(id: number) {
