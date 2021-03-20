@@ -17,7 +17,7 @@ export class AuthService {
   }
 
   async validateUserById(id: number): Promise<Omit<User, 'password'> | null> {
-    const user = await this.usersService.findById(id);
+    const user = await this.usersService.findById({ id });
     if (user) {
       return this.stripPassword(user);
     }

@@ -1,4 +1,14 @@
-import { Check, Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import {
+  Check,
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+  Unique,
+} from 'typeorm';
+
+import { Community } from '../community/entities';
 
 @Unique('UQ_USERNAME', ['username'])
 @Unique('UQ_EMAIL', ['email'])
@@ -22,4 +32,8 @@ export class User {
 
   @Column({ default: false })
   needsSetup: boolean;
+
+  @ManyToMany(() => Community, (community) => community.members)
+  @JoinTable({ name: 'community_members' })
+  joinedCommunities: Community[];
 }

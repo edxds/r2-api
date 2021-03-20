@@ -4,6 +4,8 @@ import { IsEmail, IsNotEmpty, Length } from 'class-validator';
 import { Repository } from 'typeorm';
 import { hash } from 'bcrypt';
 
+import { ensureFound } from 'r2/utils/ensureFound';
+
 import { User } from './user.entity';
 import { MinimalSocialProfile } from './users.types';
 
@@ -25,8 +27,16 @@ export class UsersService {
     return result;
   }
 
-  async findById(id: number): Promise<User | undefined> {
-    return this.userRepository.findOne(id);
+  async findById({
+    id,
+    includeCommunities,
+  }: {
+    id: number;
+    includeCommunities?: boolean;
+  }): Promise<User | undefined> {
+    return this.userRepository.findOne(id, {
+      relations: [...(includeCommunities ? ['joinedCommunities'] : [])],
+    });
   }
 
   async findByUsername(username: string): Promise<User | undefined> {
@@ -69,6 +79,13 @@ export class UsersService {
         password: '',
       });
     }
+  }
+
+  async joinedCommunities(id: number) {
+    const user = await this.findById({ id, includeCommunities: true });
+    ensureFound(user, 'Usuário não encontrado!');
+
+    return user.joinedCommunities;
   }
 
   private generateUniqueUsername(prefix: string) {

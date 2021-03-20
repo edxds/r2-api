@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn, Unique } from 'typeorm';
+
+import { User } from 'r2/features/users';
 
 @Unique('UQ_CODE', ['code'])
 @Entity({ name: 'communities' })
@@ -20,4 +22,7 @@ export class Community {
 
   @Column({ default: false })
   isPrivate: boolean;
+
+  @ManyToMany(() => User, (user) => user.joinedCommunities)
+  members: User[];
 }
