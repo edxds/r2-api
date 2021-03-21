@@ -44,13 +44,13 @@ export class PostService {
 
   async remove(id: number) {
     const post = await this.findOne(id);
-    const result = await this.postRepo.delete({ id: post.id });
+    await this.postRepo.delete({ id: post.id });
 
     this.eventEmitter.emit(
       PostDeletedEvent.eventName,
       new PostDeletedEvent(post.id, post.communityId, post.parentPostId),
     );
 
-    return result;
+    return post;
   }
 }
