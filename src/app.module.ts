@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MulterModule } from '@nestjs/platform-express';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import multer from 'multer';
 
 import config from '../ormconfig';
@@ -20,6 +21,9 @@ const memoryStorage = multer.memoryStorage();
   imports: [
     TypeOrmModule.forRoot(config),
     MulterModule.register({ storage: memoryStorage }),
+    EventEmitterModule.forRoot({
+      ignoreErrors: true,
+    }),
     UsersModule,
     AuthModule,
     TimeModule,

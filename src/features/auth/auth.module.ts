@@ -13,6 +13,7 @@ import { LocalStrategy } from './local.strategy';
 import { GoogleStrategy } from './google.strategy';
 import { JwtStrategy } from './jwt.strategy';
 import { constants } from './constants';
+import { GatewayAuthGuard } from './gateway.guard';
 
 @Module({
   imports: [
@@ -22,7 +23,15 @@ import { constants } from './constants';
     JwtModule.register({ secret: constants.secret }),
     TypeOrmModule.forFeature([Token]),
   ],
-  providers: [AuthService, LocalStrategy, GoogleStrategy, JwtStrategy, TokensService],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    GoogleStrategy,
+    JwtStrategy,
+    TokensService,
+    GatewayAuthGuard,
+  ],
+  exports: [JwtStrategy],
   controllers: [AuthController],
 })
 export class AuthModule {}
