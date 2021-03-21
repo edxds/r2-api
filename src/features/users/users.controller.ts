@@ -23,4 +23,11 @@ export class UsersController {
 
     return this.usersService.joinedCommunities(request.user['id']);
   }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('posts')
+  async posts(@Req() { user }: Request) {
+    if (!user) throw new HttpException('Você precisa fazer login primeiro', 403);
+    return this.usersService.posts(user['id']);
+  }
 }

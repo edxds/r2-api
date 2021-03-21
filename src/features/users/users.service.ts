@@ -30,12 +30,17 @@ export class UsersService {
   async findById({
     id,
     includeCommunities,
+    includePosts,
   }: {
     id: number;
     includeCommunities?: boolean;
+    includePosts?: boolean;
   }): Promise<User | undefined> {
     return this.userRepository.findOne(id, {
-      relations: [...(includeCommunities ? ['joinedCommunities'] : [])],
+      relations: [
+        ...(includeCommunities ? ['joinedCommunities'] : []),
+        ...(includePosts ? ['posts', 'posts.community'] : []),
+      ],
     });
   }
 
@@ -94,6 +99,13 @@ export class UsersService {
     ensureFound(user, 'Usuário não encontrado!');
 
     return user.joinedCommunities;
+  }
+
+  async posts(id: number) {
+    const user = await this.findById({ id, includePosts: true });
+    ensureFound(user, 'Usuário não encontrado!');
+
+    return user.posts;
   }
 
   private generateUniqueUsername(prefix: string) {

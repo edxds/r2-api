@@ -35,8 +35,16 @@ export class CommunityController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string, @Query('includeMembers') includeMembers: string) {
-    return this.communityService.findOne({ id: +id, includeMembers: !!includeMembers });
+  findOne(
+    @Param('id') id: string,
+    @Query('includeMembers') includeMembers: string,
+    @Query('includePosts') includePosts: string,
+  ) {
+    return this.communityService.findOne({
+      id: +id,
+      includeMembers: !!includeMembers,
+      includePosts: !!includePosts,
+    });
   }
 
   @Put(':id')

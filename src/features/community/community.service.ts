@@ -36,11 +36,16 @@ export class CommunityService {
   async findOne({
     id,
     includeMembers,
+    includePosts,
   }: {
     id: number;
     includeMembers?: boolean;
+    includePosts?: boolean;
   }): Promise<Community> {
-    const relations = [...(includeMembers ? ['members'] : [])];
+    const relations = [
+      ...(includeMembers ? ['members'] : []),
+      ...(includePosts ? ['posts', 'posts.author', 'posts.replies'] : []),
+    ];
     const community = await this.communityRepo.findOne(id, { relations });
     if (!community) {
       throw new HttpException('Essa comunidade não existe', 404);

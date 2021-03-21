@@ -4,11 +4,13 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
 
 import { Community } from '../community/entities';
+import { Post } from '../post/entities';
 
 @Unique('UQ_USERNAME', ['username'])
 @Unique('UQ_EMAIL', ['email'])
@@ -36,4 +38,7 @@ export class User {
   @ManyToMany(() => Community, (community) => community.members)
   @JoinTable({ name: 'community_members' })
   joinedCommunities: Community[];
+
+  @OneToMany(() => Post, (post) => post.author)
+  posts: Promise<Post[]>;
 }

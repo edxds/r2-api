@@ -11,6 +11,7 @@ import { TimeModule } from './features/time';
 import { UsersModule } from './features/users';
 import { AuthModule } from './features/auth';
 import { StorageModule } from './features/storage';
+import { PostModule } from './features/post';
 import { CommunityModule } from './features/community/community.module';
 
 const memoryStorage = multer.memoryStorage();
@@ -24,6 +25,7 @@ const memoryStorage = multer.memoryStorage();
     TimeModule,
     StorageModule,
     CommunityModule,
+    PostModule,
   ],
   controllers: [AppController],
   providers: [AppService],
