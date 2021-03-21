@@ -81,6 +81,14 @@ export class UsersService {
     }
   }
 
+  async findWithPassword({ id, username }: { id?: number; username?: string }) {
+    return this.userRepository
+      .createQueryBuilder('user')
+      .addSelect('user.password')
+      .where('user.id = :id OR user.username = :username', { id, username })
+      .getOne();
+  }
+
   async joinedCommunities(id: number) {
     const user = await this.findById({ id, includeCommunities: true });
     ensureFound(user, 'Usuário não encontrado!');

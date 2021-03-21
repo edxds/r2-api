@@ -8,7 +8,7 @@ export class AuthService {
   constructor(private usersService: UsersService) {}
 
   async validateUser(username: string, password: string): Promise<Omit<User, 'password'> | null> {
-    const user = await this.usersService.findByUsername(username);
+    const user = await this.usersService.findWithPassword({ username });
     if (user && (await compare(password, user.password))) {
       return this.stripPassword(user);
     }
@@ -16,13 +16,8 @@ export class AuthService {
     return null;
   }
 
-  async validateUserById(id: number): Promise<Omit<User, 'password'> | null> {
-    const user = await this.usersService.findById({ id });
-    if (user) {
-      return this.stripPassword(user);
-    }
-
-    return null;
+  async validateUserById(id: number): Promise<Omit<User, 'password'> | undefined> {
+    return await this.usersService.findById({ id });
   }
 
   async validateUserBySocialLogin(
