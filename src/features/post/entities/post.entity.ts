@@ -1,4 +1,12 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { User } from 'r2/features/users';
 import { Community } from 'r2/features/community/entities';
@@ -19,6 +27,9 @@ export class Post {
 
   @Column({ nullable: true })
   parentPostId?: number;
+
+  @CreateDateColumn()
+  createdAt: string;
 
   @JoinColumn({ name: 'author_id' })
   @ManyToOne(() => User, (user) => user.posts)
