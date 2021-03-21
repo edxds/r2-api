@@ -18,7 +18,7 @@ export class Post {
   communityId: number;
 
   @Column({ nullable: true })
-  parentPostId: number;
+  parentPostId?: number;
 
   @JoinColumn({ name: 'author_id' })
   @ManyToOne(() => User, (user) => user.posts)
