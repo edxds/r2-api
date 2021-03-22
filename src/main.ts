@@ -5,7 +5,7 @@ import * as ip from 'ip';
 
 import { AppModule } from './app.module';
 
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 const FRONTEND_PORT = 3000;
 
 async function bootstrap() {
