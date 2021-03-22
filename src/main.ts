@@ -1,4 +1,4 @@
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
 import * as ip from 'ip';
@@ -25,6 +25,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   await app.listen(PORT);
+  Logger.log(`Listening on port ${PORT}`, 'bootstrap');
 }
 
 bootstrap();
