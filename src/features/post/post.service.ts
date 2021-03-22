@@ -37,7 +37,10 @@ export class PostService {
   }
 
   async findOne(id: number) {
-    const post = await this.postRepo.findOne(id);
+    const post = await this.postRepo.findOne(id, {
+      relations: ['author', 'community', 'replies', 'replies.author', 'replies.replies'],
+    });
+
     ensureFound(post, 'Post não encontrado');
     return post;
   }
