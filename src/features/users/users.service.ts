@@ -38,7 +38,9 @@ export class UsersService {
   }): Promise<User | undefined> {
     return this.userRepository.findOne(id, {
       relations: [
-        ...(includeCommunities ? ['joinedCommunities'] : []),
+        ...(includeCommunities
+          ? ['joinedCommunities', 'joinedCommunities.members', 'joinedCommunities.posts']
+          : []),
         ...(includePosts ? ['posts', 'posts.community'] : []),
       ],
     });
