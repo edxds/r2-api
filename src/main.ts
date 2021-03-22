@@ -11,9 +11,12 @@ const FRONTEND_PORT = 3000;
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     cors: {
-      origin: ['http', 'https'].flatMap((protocol) =>
-        ['localhost', ip.address()].map((address) => `${protocol}://${address}:${FRONTEND_PORT}`),
-      ),
+      origin: [
+        ...['http', 'https'].flatMap((protocol) =>
+          ['localhost', ip.address()].map((address) => `${protocol}://${address}:${FRONTEND_PORT}`),
+        ),
+        'https://jamelon.edxds.com',
+      ],
       credentials: true,
     },
   });
