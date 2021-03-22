@@ -40,7 +40,7 @@ export class Post {
   community?: Community;
 
   @JoinColumn({ name: 'parent_post_id' })
-  @ManyToOne(() => Post, (post) => post.replies, { nullable: true })
+  @ManyToOne(() => Post, (post) => post.replies, { nullable: true, onDelete: 'CASCADE' })
   parent?: Post;
 
   @OneToMany(() => Post, (post) => post.parent)
