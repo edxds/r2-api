@@ -17,6 +17,9 @@ const config: ConnectionOptions & TypeOrmModuleOptions = {
   cli: {
     migrationsDir: 'migrations',
   },
+  ssl: {
+    rejectUnauthorized: false,
+  },
 };
 
 export = config;
