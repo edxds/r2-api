@@ -8,6 +8,7 @@ import { TimeModule } from '../time';
 
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
+import { AuthInterceptor } from './auth.interceptor';
 import { TokensService, Token } from './tokens';
 import { LocalStrategy } from './local.strategy';
 import { GoogleStrategy } from './google.strategy';
@@ -25,13 +26,14 @@ import { GatewayAuthGuard } from './gateway.guard';
   ],
   providers: [
     AuthService,
+    AuthInterceptor,
     LocalStrategy,
     GoogleStrategy,
     JwtStrategy,
     TokensService,
     GatewayAuthGuard,
   ],
-  exports: [JwtStrategy],
+  exports: [JwtStrategy, AuthService],
   controllers: [AuthController],
 })
 export class AuthModule {}

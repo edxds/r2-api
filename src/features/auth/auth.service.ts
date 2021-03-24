@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { compare } from 'bcrypt';
+import { Response } from 'express';
 
 import { MinimalSocialProfile, User, UsersService } from '../users';
 
@@ -30,6 +31,26 @@ export class AuthService {
     }
 
     return null;
+  }
+
+  attachTokenToResponse(token: string, response: Response) {
+    const twoWeeks = 14 * 24 * 3_600_000;
+    const environment = process.env.NODE_ENV ?? 'development';
+    response.cookie(
+      'token',
+      token,
+      environment === 'development'
+        ? {
+            sameSite: 'lax',
+            httpOnly: true,
+            maxAge: twoWeeks,
+          }
+        : {
+            secure: true,
+            httpOnly: true,
+            maxAge: twoWeeks,
+          },
+    );
   }
 
   private stripPassword(user: User): Omit<User, 'password'> {

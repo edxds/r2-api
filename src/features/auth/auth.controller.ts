@@ -16,10 +16,12 @@ import { Request, Response } from 'express';
 import { RegisterUserDto, User, UsersService } from '../users';
 
 import { TokensService } from './tokens';
+import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
+    private authService: AuthService,
     private tokensService: TokensService, //
     private userService: UsersService,
   ) {}
@@ -33,10 +35,7 @@ export class AuthController {
   ) {
     try {
       const user = await this.userService.register(registerDto);
-      return this.generateJwtAndAttach(
-        { user, agent: req.headers['user-agent'], isSecure: req.secure },
-        res,
-      );
+      return this.generateJwtAndAttach({ user, agent: req.headers['user-agent'] }, res);
     } catch (error) {
       if (error.constraint === 'UQ_USERNAME')
         throw new HttpException('Um usuário já existe com esse nome de usuário', 409);
@@ -76,18 +75,13 @@ export class AuthController {
       {
         user: req.user as Omit<User, 'password'>,
         agent: req.headers['user-agent'],
-        isSecure: req.secure,
       },
       res,
     );
   }
 
   private async generateJwtAndAttach(
-    {
-      user,
-      agent = '',
-      isSecure,
-    }: { user: Omit<User, 'password'>; agent?: string; isSecure?: boolean },
+    { user, agent = '' }: { user: Omit<User, 'password'>; agent?: string },
     res?: Response,
   ) {
     const result = await this.tokensService.createAndPersist({
@@ -95,17 +89,7 @@ export class AuthController {
       agent: agent,
     });
 
-    const environment = process.env.NODE_ENV ?? 'development';
-    res?.cookie(
-      'token',
-      result.access_token,
-      environment === 'development'
-        ? {
-            sameSite: 'lax',
-            httpOnly: true,
-          }
-        : { secure: isSecure, httpOnly: true },
-    );
+    res && this.authService.attachTokenToResponse(result.access_token, res);
 
     return {
       user: user,
