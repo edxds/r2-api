@@ -17,9 +17,13 @@ const config: ConnectionOptions & TypeOrmModuleOptions = {
   cli: {
     migrationsDir: 'migrations',
   },
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  ...(process.env.DATABASE_URL
+    ? {
+        ssl: {
+          rejectUnauthorized: false,
+        },
+      }
+    : {}),
 };
 
 export = config;
