@@ -33,6 +33,10 @@ export class TokensService {
     return { access_token: signedJwt };
   }
 
+  async revoke(tokenId: number) {
+    return this.tokenRepository.delete(tokenId);
+  }
+
   async wasRevoked(tokenId: number) {
     const token = await this.tokenRepository.findOne(tokenId);
     return !token || token.revoked;

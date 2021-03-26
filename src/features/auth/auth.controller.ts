@@ -5,6 +5,7 @@ import {
   Get,
   HttpException,
   Post,
+  Query,
   Req,
   Res,
   UseGuards,
@@ -62,6 +63,24 @@ export class AuthController {
   @Get('google/callback')
   async googleCallback(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     return this.generateJwtAndAttachFromRequest(req, res);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('revoke')
+  async revoke(
+    @Query('token') token: string,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const tokenId = token && parseInt(token);
+    if (tokenId) {
+      return this.tokensService.revoke(tokenId);
+    }
+
+    req.tokenId && (await this.tokensService.revoke(req.tokenId));
+    res.clearCookie('token');
+
+    return { success: true, message: 'Usuário deslogado' };
   }
 
   @UseGuards(AuthGuard('jwt'))

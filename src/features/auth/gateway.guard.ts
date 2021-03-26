@@ -35,6 +35,6 @@ export class GatewayAuthGuard implements CanActivate {
     }
 
     const decodedToken = await verifyToken(token, constants.secret!);
-    return !!this.strategy.validate(decodedToken);
+    return !!this.strategy.validate(null, decodedToken);
   }
 }
